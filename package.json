@@ -1,0 +1,8 @@
+{
+  "name": "chat",
+  "version": "0.0.1",
+  "description": "A basic chat server",
+  "dependencies": {
+    "express": "^4.10.2"
+  }
+}

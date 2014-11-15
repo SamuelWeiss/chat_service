@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Simple Chat</title>
+    <style>
+      body { font: 13px Helvetica, Arial; }
+    </style>
+  </head>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>  
+  var name = prompt("Please enter your username", "Guest");
+  var socket = io();
+  socket.emit('name', name);
+</script>
+
+  <body>
+    <p> You're on the test page </p>
+  </body>
+</html>
