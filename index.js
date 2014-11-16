@@ -152,6 +152,7 @@ io.on('connection', function(socket){
 	for(index=0; index<online.length; index++){
 	    if(online[index].name == user){
 		online[index].socket.emit("invite", data);
+	    }
 	}
     });
 

@@ -35,17 +35,19 @@
 <script>  
   var name = prompt("Please enter your username", "Guest");
   var socket = io();
-  var online_users = [];
+  var online_users = ["Brett"];
   socket.emit('name', name);
   refresh_users();
 
-  $("#users").autocomplete({
-    source: online_users
-    select: function(event, ui){
-      var selected_user = ui.item;
-      alert(selected_user.value);
-      socket.emit("invite", selected_user.value);
-    }
+  $(document).ready(function (){
+    $("#user_selection").autocomplete({
+      source: online_users,
+      select: function(event, ui){
+        var selected_user = ui.item;
+        alert(selected_user.value);
+        socket.emit("invite", selected_user.value);
+      }
+    });
   });
 
   function refresh_users(){
@@ -61,8 +63,13 @@
 
   socket.on("online_users", function(temp){
     online_users = temp;
-    $("#users").autocomplete({
-      source: online_users
+    $("#user_selection").autocomplete({
+      source: online_users,
+      select: function(event, ui){
+        var selected_user = ui.item;
+        alert(selected_user.value);
+        socket.emit("invite", selected_user.value);
+      }
     });
   });
 
