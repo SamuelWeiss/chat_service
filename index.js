@@ -27,7 +27,7 @@ var banned = [
 ];
 
 //stores the number of rooms
-var num_rooms;
+var num_rooms = 20;
 
 //This handles requests for the main page, and serves chat.html to users
 //who request it.
@@ -46,7 +46,6 @@ app.get('/search/', function(req, res){
 //wait and listen for events (all of the socket.on statements) and then
 //will execute some function
 //TODO: implement search
-//TODO: fix online information - need more than just names
 io.on('connection', function(socket){
     var name = "UNSET";
     var room = -1;
@@ -59,7 +58,7 @@ io.on('connection', function(socket){
 	// therefore are not in the online array
 	if (name != "UNSET"){
 	    for (index=0; index<online.length; index++){
-		if(online[index].name == name and online[index].room = room){
+		if(online[index].name == name && online[index].room == room){
 		    online.splice(index, 1);
 		}
 	    }
@@ -98,20 +97,49 @@ io.on('connection', function(socket){
 
     socket.on('message', function(message){
 	//TODO: do something here
-	if(valid_user){
-	    console.log('User ' + name + ' has sent: ' + message);
+	var index;
+	if(!valid_user){
+	    return;
+	}
+	if(room == -1){
+	    socket.emit('error', "Error: no room set");
+	    return;
+	}
+	var msg = {
+	    name: name,
+	    message: message,
+	};
+	//cycle through the index and emit to everyone in your room
+	for (index=0; index<online.length; index++){
+	    if(online[index].room == room){
+		online[index].socket.emit('message', msg);
+	    }
 	}
     });
     
     //allows the user to choose a chat room to enter
     socket.on("choose_room", function(room_number){
 	if(valid_user and room_number <= num_rooms){
+	    for (index=0; index<online.length; index++){
+		if(online[index].name == name && online[index].room == room){
+		    online[index].room = room_number;
+		}
+	    }
 	    room = room_number;
 	}
     });
 
     socket.on("request_online", function(){
-	//TODO put code here
+	//strip all of the sockets out of online and send it
+	var temp = [];
+	var index;
+	for(index=0; index<online.length; index++){
+	    temp[temp.length] = {
+		name:online[index].name,
+		room:online[index].room
+	    };
+	}
+	socket.emit('online_users', temp);
     });
 
 });

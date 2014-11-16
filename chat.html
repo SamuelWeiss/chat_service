@@ -8,13 +8,17 @@
   </head>
 
   <body>
-    <p> You're on the test page </p>
+    <p> Messages </p>
+    <div class="messages"> Messages </div>
     <form id="message" action="javascript:alert('Success!');">
-      <input type="text" value="Message">
+      <input type="text" value="">
       <input type="submit" value="Send">
     </form>
     <div id="other">
-      
+      <select>
+	<option value="loading">Options loading</option>
+      </select>
+      <button type="button" onclick="refresh_users()">Refresh Users</button>
     </div>
   </body>
 
@@ -27,16 +31,28 @@
   var socket = io();
   socket.emit('name', name);
 
+  function refresh_users(){
+    socket.emit("request_online", "");
+  }
+
+  socket.on("online_users", function(temp){
+    <!-- do stuff here -->
+
+  });
+
   socket.on("name_response", function(valid){
     if(valid == "Failure"){
       alert("Your username has been banned! You will not be able to message anyone!");
     }
   });
+
+  socket.on("message", function(msg){
+    $(".messages").append(msg.name + ": " + msg.message);
+  });
   
   
   $("#message").submit(function( event ){
     socket.emit('message', $("input:first").val());
-    <!--alert("You tried to send the message: " + $("input:first").val());-->
     event.preventDefault();
     $("input:first").val() = '';
   });
