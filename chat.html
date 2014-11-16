@@ -14,7 +14,7 @@
       <input type="submit" value="Send">
     </form>
     <div id="other">
-      Trigger the handler
+      
     </div>
   </body>
 
@@ -27,11 +27,18 @@
   var socket = io();
   socket.emit('name', name);
 
+  socket.on("name_response", function(valid){
+    if(valid == "Failure"){
+      alert("Your username has been banned! You will not be able to message anyone!");
+    }
+  });
   
   
   $("#message").submit(function( event ){
-    alert("You tried to send the message" + $("input:first").val());
+    socket.emit('message', $("input:first").val());
+    <!--alert("You tried to send the message: " + $("input:first").val());-->
     event.preventDefault();
+    $("input:first").val() = '';
   });
 
 </script>
