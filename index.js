@@ -102,7 +102,7 @@ io.on('connection', function(socket){
 	    return;
 	}
 	if(room == -1){
-	    socket.emit('error', "Error: no room set");
+	    socket.emit("msg_error", "Error: no room set");
 	    return;
 	}
 	var msg = {
@@ -119,7 +119,7 @@ io.on('connection', function(socket){
     
     //allows the user to choose a chat room to enter
     socket.on("choose_room", function(room_number){
-	if(valid_user and room_number <= num_rooms){
+	if(valid_user && room_number <= num_rooms){
 	    for (index=0; index<online.length; index++){
 		if(online[index].name == name && online[index].room == room){
 		    online[index].room = room_number;
@@ -134,12 +134,25 @@ io.on('connection', function(socket){
 	var temp = [];
 	var index;
 	for(index=0; index<online.length; index++){
-	    temp[temp.length] = {
+/*	    temp[temp.length] = {
 		name:online[index].name,
 		room:online[index].room
-	    };
+	    };*/
+	    temp[temp.length] = online[index].name;
 	}
 	socket.emit('online_users', temp);
+    });
+
+    socket.on("invite", function(user){
+	var index;
+	var data = {
+	    name: name,
+	    room: room
+	};
+	for(index=0; index<online.length; index++){
+	    if(online[index].name == user){
+		online[index].socket.emit("invite", data);
+	}
     });
 
 });

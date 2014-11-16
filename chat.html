@@ -19,6 +19,10 @@
 	<option value="loading">Options loading</option>
       </select>
       <button type="button" onclick="refresh_users()">Refresh Users</button>
+      <div class="autocomplete">
+	<label for="users">Users: </label>
+	<input id="user_selection">
+      </div>
     </div>
   </body>
 
@@ -26,18 +30,44 @@
 
 <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+
 <script>  
   var name = prompt("Please enter your username", "Guest");
   var socket = io();
+  var online_users = [];
   socket.emit('name', name);
+  refresh_users();
+
+  $("#users").autocomplete({
+    source: online_users
+    select: function(event, ui){
+      var selected_user = ui.item;
+      alert(selected_user.value);
+      socket.emit("invite", selected_user.value);
+    }
+  });
 
   function refresh_users(){
     socket.emit("request_online", "");
   }
 
-  socket.on("online_users", function(temp){
-    <!-- do stuff here -->
+  socket.on("invite", function(data){
+    var answer = confirm("You have been invited to chat by " + data.name + ". Would you like to accept?");
+    if(answer == "true"){
+      socket.emit("choose_room", data.room);
+    }
+  });
 
+  socket.on("online_users", function(temp){
+    online_users = temp;
+    $("#users").autocomplete({
+      source: online_users
+    });
+  });
+
+  socket.on("msg_error", function(msg){
+    alert("You attempted to post a message when you're not in a room!");
   });
 
   socket.on("name_response", function(valid){
@@ -49,6 +79,8 @@
   socket.on("message", function(msg){
     $(".messages").append(msg.name + ": " + msg.message);
   });
+
+      
   
   
   $("#message").submit(function( event ){
@@ -56,6 +88,9 @@
     event.preventDefault();
     $("input:first").val() = '';
   });
+
+ 
+
 
 </script>
 
