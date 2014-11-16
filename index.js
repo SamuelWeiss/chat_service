@@ -14,7 +14,7 @@ io.on('connection', function(socket){
     var room = -1;
 
     socket.on('disconnect', function(){
-	console.log('remove user from online now');
+	console.log('remove user: ' + name +' from online now');
     });
 
     socket.on('name', function(uname){

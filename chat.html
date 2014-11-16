@@ -7,15 +7,33 @@
     </style>
   </head>
 
+  <body>
+    <p> You're on the test page </p>
+    <form id="message" action="javascript:alert('Success!');">
+      <input type="text" value="Message">
+      <input type="submit" value="Send">
+    </form>
+    <div id="other">
+      Trigger the handler
+    </div>
+  </body>
 
-<script src="/socket.io/socket.io.js"></script>
+
+
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 <script>  
   var name = prompt("Please enter your username", "Guest");
   var socket = io();
   socket.emit('name', name);
+
+  
+  
+  $("#message").submit(function( event ){
+    alert("You tried to send the message" + $("input:first").val());
+    event.preventDefault();
+  });
+
 </script>
 
-  <body>
-    <p> You're on the test page </p>
-  </body>
 </html>
