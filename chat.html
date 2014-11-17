@@ -10,14 +10,17 @@
   <body>
     <p> Messages </p>
     <div class="messages"> Messages </div>
-    <form id="message" action="javascript:alert('Success!');">
+    <form id="message">
       <input type="text" value="">
       <input type="submit" value="Send">
     </form>
+    <p></p>
+    <form id="room_selector">
+      <input id="room_selection" type="text" value="">
+      <input type="submit" value="Join">
+    </form>
     <div id="other">
-      <select>
-	<option value="loading">Options loading</option>
-      </select>
+      <p></p>
       <button type="button" onclick="refresh_users()">Refresh Users</button>
       <div class="autocomplete">
 	<label for="users">Users: </label>
@@ -44,7 +47,6 @@
       source: online_users,
       select: function(event, ui){
         var selected_user = ui.item;
-        alert(selected_user.value);
         socket.emit("invite", selected_user.value);
       }
     });
@@ -85,18 +87,21 @@
 
   socket.on("message", function(msg){
     $(".messages").append(msg.name + ": " + msg.message);
+    $(".messages").append("<p></p>");
   });
-
-      
-  
   
   $("#message").submit(function( event ){
     socket.emit('message', $("input:first").val());
     event.preventDefault();
-    $("input:first").val() = '';
+    $("input:first").val('');
+    
   });
 
- 
+  $("#room_selector").submit(function(event){
+    socket.emit("choose_room", $("#room_selection").val());
+    event.preventDefault();
+    alert("You've joined room " + $("#room_selection").val());
+  });
 
 
 </script>

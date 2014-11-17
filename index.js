@@ -45,7 +45,6 @@ app.get('/search/', function(req, res){
 //This line of code triggers when we get a new socket connection, it will
 //wait and listen for events (all of the socket.on statements) and then
 //will execute some function
-//TODO: implement search
 io.on('connection', function(socket){
     var name = "UNSET";
     var room = -1;
@@ -119,7 +118,7 @@ io.on('connection', function(socket){
     
     //allows the user to choose a chat room to enter
     socket.on("choose_room", function(room_number){
-	if(valid_user && room_number <= num_rooms){
+	if(valid_user){
 	    for (index=0; index<online.length; index++){
 		if(online[index].name == name && online[index].room == room){
 		    online[index].room = room_number;
