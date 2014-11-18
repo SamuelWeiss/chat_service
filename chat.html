@@ -26,6 +26,9 @@
 	<label for="users">Users: </label>
 	<input id="user_selection">
       </div>
+      <p></p>
+      <input type="file" id="file" name="file" />
+      <output id="list"></output>
     </div>
   </body>
 
@@ -123,6 +126,12 @@
     alert("You've joined room " + $("#room_selection").val());
   });
 
+  function handleFileSelect(event){
+    var file = event.target.file; 
+    //do something..
+  }
+  
+  $("#files").addEventListener("change", handleFileSelect, false);
 
 </script>
 
