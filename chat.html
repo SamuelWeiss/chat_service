@@ -36,15 +36,22 @@
 <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 
 <script>  
+  //When the page loads ask the user for their name
+  //TODO: store their name in local storage and load it if it's there
   var name = prompt("Please enter your username", "Guest");
+  //make a socket to our server so we can recieve messages
   var socket = io();
-  var online_users = ["Brett"];
+  var online_users = [];
   socket.emit('name', name);
   refresh_users();
 
+  //This block of code will ready the autocompleting user list when the page
+  //loads
   $(document).ready(function (){
     $("#user_selection").autocomplete({
       source: online_users,
+      //When the user selects a name, send a message back to the server to
+      //invite them to the current chat room
       select: function(event, ui){
         var selected_user = ui.item;
         socket.emit("invite", selected_user.value);
@@ -52,10 +59,13 @@
     });
   });
 
+  //A small wrapper function to request online users
   function refresh_users(){
     socket.emit("request_online", "");
   }
 
+  //If the user has been invited to a chat room, pull up a dialogue box
+  //to ask them if they want to change rooms
   socket.on("invite", function(data){
     var answer = confirm("You have been invited to chat by " + data.name + ". Would you like to accept?");
     if(answer == "true"){
@@ -63,6 +73,8 @@
     }
   });
 
+  //when we get our response back for online users we want to update
+  //the autocomplete list
   socket.on("online_users", function(temp){
     online_users = temp;
     $("#user_selection").autocomplete({
@@ -75,21 +87,27 @@
     });
   });
 
+  //If the users tries to send a message when they're not in a room, alert
+  //them that they cannot send it
   socket.on("msg_error", function(msg){
     alert("You attempted to post a message when you're not in a room!");
   });
 
+  //If the username that the user has chosen was banned, then alert them
   socket.on("name_response", function(valid){
     if(valid == "Failure"){
       alert("Your username has been banned! You will not be able to message anyone!");
     }
   });
 
+  //When we recieve a new message from the server, attach it to our message div
+  //TODO: remove old messages
   socket.on("message", function(msg){
     $(".messages").append(msg.name + ": " + msg.message);
     $(".messages").append("<p></p>");
   });
   
+  //When the user submits a message, send it to the server
   $("#message").submit(function( event ){
     socket.emit('message', $("input:first").val());
     event.preventDefault();
@@ -97,6 +115,8 @@
     
   });
 
+  //When the user selects a new room, tell the server to send messages to the
+  //user from that room
   $("#room_selector").submit(function(event){
     socket.emit("choose_room", $("#room_selection").val());
     event.preventDefault();
